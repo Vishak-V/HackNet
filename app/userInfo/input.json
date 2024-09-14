@@ -306,5 +306,19 @@
         "note": "looking forward to the challenge!",
         "trait": "flexible",
         "discordLink": "https://discord.gg/gihpcx40"
+    },
+    {
+        "userId": 45671938,
+        "name": "john",
+        "experienceLevel": "expert",
+        "role1": "front-end",
+        "role2": "business",
+        "primaryLanguages": ["react", "css", "typescript"],
+        "secondaryLanguages": ["excel", "wordpress", "powerpoint"],
+        "school": "usf",
+        "goal": "win hackathon",
+        "note": "hackathons are fun!",
+        "trait": "analytical",
+        "discordLink": "https://discord.gg/asdfih67"
     }
 ]
