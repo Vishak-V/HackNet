@@ -4,7 +4,7 @@ from app import schemas
 import typing_extensions as typing
 import google.generativeai as genai
 
-    # Set endpoint to EU 
+from model import cos_sim
   
 import PyPDF2 as pdf
 from dotenv import load_dotenv
@@ -46,10 +46,11 @@ def hash(password: str):
 def verifyPassword(plainPassword: str,hashedPassword: str):
     return pwd_context.verify(plainPassword,hashedPassword)
 
-def recommendation(userInfo: schemas.UserInfoResponse, users_info):
-    # This function should return a list of possible matches based on the user's responses
-    # The list should be in the form of a PossibleMatches object
-    pass
+def recommendation(userInfo: schemas.UserInfoResponse, users_info:List[schemas.UserInfoResponse]):
+    
+    return cos_sim.get_recommendations(userInfo.dict(),[user_info.dict() for user_info in users_info])
+
+    
 
 async def parse(pdfFile):
     pdfFile.seek(0)

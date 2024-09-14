@@ -50,13 +50,23 @@ async def upload_file(file: UploadFile,db: Session=Depends(get_db),currentUser: 
     db.refresh(newUserInfo)
     return newUserInfo
     
-    
-    
-    
 
 @router.get("/",response_model=schemas.UserInfoResponse)
-def get_user_info(db: Session=Depends(get_db),currentUser: UUID = Depends(oauth2.get_current_user)):
-    user_info=db.query(models.UserInfo).filter(models.UserInfo.userId==currentUser).first()
+def get_user_info(db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
+    user_info=db.query(models.UserInfo).filter(models.UserInfo.userId==currentUser.id).first()
     if not user_info:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User info not found")
     return jsonable_encoder(user_info)
+
+@router.put("/goal",response_model=schemas.UserInfoResponse)
+def update_user_goal(info: schemas.UpdateGoal, db: Session = Depends(get_db), currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
+    # Find the user record by ID
+    updateQuery=db.query(models.UserInfo).filter(models.UserInfo.userId==currentUser.id)
+    if not updateQuery.first():
+        raise HTTPException(status_code=404, detail="No info found for this user")
+    if updateQuery.first().userId!=currentUser.id:
+        raise HTTPException(status_code=403, detail="You are not authorized to update this user's info")
+    updatedData={"goal":info.goal}
+    updateQuery.update(updatedData)
+    db.commit()
+    return JSONResponse(content={"message":"Goal updated successfully"})

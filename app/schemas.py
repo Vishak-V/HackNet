@@ -91,6 +91,11 @@ class TokenData(BaseModel):
     class config:
         orm_mode=True
 
+class UpdateGoal(BaseModel):
+    goal: str
+    class Config:
+        orm_mode=True
+
 
     
 
