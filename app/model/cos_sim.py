@@ -322,7 +322,7 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
                 
             recommendations.append(
                 {
-                    # "userId": matching_row['userId'].iloc[0],
+                    "userId": matching_row['userId'].iloc[0],
                     "name": matching_row['name'].values[0],
                     "experienceLevel": matching_row['experienceLevel'].values[0],
                     "role1": matching_row['role1'].values[0],
@@ -346,8 +346,11 @@ if __name__ == '__main__':
     # Define relative path
     current_dir = os.getcwd()
     project_dir = os.path.dirname(current_dir)
+    sys.path.append(project_dir)
 
     USERDATA = pathlib.Path(os.path.join(project_dir, 'userInfo'))
+    print(USERDATA)
+    sys.path.append(USERDATA)
     
     # Read in the input and an example
     with open(os.path.join(USERDATA, 'rocco.json'), 'r') as file:
