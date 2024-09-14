@@ -1,7 +1,6 @@
 annotated-types==0.7.0
 anyio==4.4.0
 asttokens==2.4.1
-click==8.1.7
 colorama==0.4.6
 comm==0.2.2
 debugpy==1.8.5
@@ -9,7 +8,6 @@ decorator==5.1.1
 executing==2.0.1
 fastapi==0.114.2
 greenlet==3.1.0
-h11==0.14.0
 idna==3.9
 ipykernel==6.29.5
 ipython==8.26.0
@@ -30,12 +28,10 @@ psutil==6.0.0
 psycopg2==2.9.9
 pure_eval==0.2.3
 pydantic==2.9.1
-pydantic-settings==2.5.2
 pydantic_core==2.23.3
 Pygments==2.18.0
 PyPDF2==3.0.1
 python-dateutil==2.9.0.post0
-python-dotenv==1.0.1
 pytz==2024.2
 pywin32==306
 pyzmq==26.1.0
@@ -51,5 +47,4 @@ tornado==6.4.1
 traitlets==5.14.3
 typing_extensions==4.12.2
 tzdata==2024.1
-uvicorn==0.30.6
 wcwidth==0.2.13
