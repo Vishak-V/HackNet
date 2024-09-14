@@ -14,19 +14,23 @@ router=APIRouter(
     tags=["roster"]
 )
 
-@router.get("/",response_model=schemas.ConfirmedMatchesInfo)
+@router.get("/")
 def get_confirmed_matches(db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
 
-    confirmedMatches=db.query(models.ConfirmedMatches).filter(models.ConfirmedMatches.user1Id==currentUser.id).all()
-    confirmedMatchesDicts = [vars(matches) for matches in confirmedMatches]
-    confirmedUserIds=[matches.user2Id for matches in confirmedMatchesDicts]
+    confirmedMatches = db.query(models.ConfirmedMatches).filter(models.ConfirmedMatches.user1Id == currentUser.id).all()
+    
+    # Extract user IDs from confirmed matches
+    confirmedUserIds = [match.user2Id for match in confirmedMatches]
+    if  len(confirmedUserIds)==0:
+        return []  # Return an empty list if no confirmed matches
 
-    matchesInfo=db.query(models.UserInfo).filter(models.UserInfo.userId in confirmedUserIds).all()
+    # Fetch user information for the confirmed user IDs
+    matchesInfo = db.query(models.UserInfo).filter(models.UserInfo.userId.in_(confirmedUserIds)).all()
 
-    users_info_dicts = [vars(user) for user in matchesInfo]
+    # Convert ORM models to dictionaries and then to Pydantic models
+    users_info_dicts = [user.__dict__ for user in matchesInfo]
     users_info_pydantic = [schemas.UserInfoResponse.model_validate(user_dict) for user_dict in users_info_dicts]
 
-    
     return users_info_pydantic
 
 @router.post("/",response_model=schemas.UserInfoResponse)
@@ -37,6 +41,8 @@ def get_team_score(roster=schemas.Roster,db: Session=Depends(get_db),currentUser
     currentRoster=[currentUserInfo,roster.user1,roster.user2,roster.user3]
 
     teamScore=utils.getScore(currentRoster)
+
+    return teamScore
 
 
 

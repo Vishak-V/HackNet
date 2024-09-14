@@ -68,8 +68,10 @@ def recommendation(userInfo: schemas.UserInfoResponse, users_info:List[schemas.U
     user_dict = userInfo.model_dump()
     
     users_dicts = [user_info.model_dump() for user_info in users_info]
-    
+  
+        
     # Call the recommendation function (assuming cos_sim.get_recommendations() exists)
+    print(user_dict,users_dicts)
     return cos_sim.get_recommendations(user_dict, users_dicts)
 
     
