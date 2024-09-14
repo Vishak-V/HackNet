@@ -1,0 +1,14 @@
+{
+    "userId": 76543210,
+    "name": "rocco",
+    "experienceLevel": "beginner",
+    "role1": "back-end",
+    "role2": "front-end",
+    "primaryLanguages": ["c++", "java", "python"],
+    "secondaryLanguages": ["react", "css", "html"],
+    "school": "virginia tech",
+    "goal": "have fun",
+    "note": "optional here",
+    "trait": "collaborative",
+    "discordLink": "discord link here"
+}
