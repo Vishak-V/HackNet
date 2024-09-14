@@ -29,9 +29,8 @@ class UserParsed(typing.TypedDict):
 async def get_gemini_repsonse(input):
     model=genai.GenerativeModel('gemini-1.5-flash')
     response=model.generate_content(input,generation_config=genai.GenerationConfig(
-        response_mime_type="application/json", response_schema=list[UserParsed], max_output_tokens=100,
+        response_mime_type="application/json", response_schema=UserParsed, max_output_tokens=100,
     ),)
-    print(response)
     return response.text
 
 

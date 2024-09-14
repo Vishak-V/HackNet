@@ -26,7 +26,7 @@ def create_user_info(user: schemas.UserInfoAdd,db: Session=Depends(get_db),curre
     return newUserInfo
 
 @router.post("/uploadfile")
-async def upload_file(file: UploadFile):
+async def upload_file(file: UploadFile,db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
     if file.content_type != 'application/pdf':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file type")
     
@@ -41,14 +41,16 @@ async def upload_file(file: UploadFile):
     # Pass the file content to the async parse function
     parsed_data = await parse(file_like_object)
     #json_data = json.loads(parsed_data)
-    parsed_data = json.loads(str(parsed_data))
+    print(parsed_data)
+    parsed_data = json.loads(parsed_data)
     #json_data = json.loads(parsed_data)
+    newUserInfo = models.UserInfo(userId=currentUser.id,name=currentUser.firstName+" "+currentUser.lastName, **parsed_data)  # Use .dict() instead of .model_dump()
+    db.add(newUserInfo)
+    db.commit()
+    db.refresh(newUserInfo)
+    return newUserInfo
     
-    # Return it as a JSON response
-    return parsed_data
-    # Return it as a JSON response
-    return parsed_data
-    # Return the parsed data along with file information
+    
     
     
 
