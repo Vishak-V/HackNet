@@ -4,7 +4,7 @@ from app import schemas
 import typing_extensions as typing
 import google.generativeai as genai
 
-from .model import cos_sim
+
   
 import PyPDF2 as pdf
 from dotenv import load_dotenv
@@ -47,8 +47,8 @@ def verifyPassword(plainPassword: str,hashedPassword: str):
     return pwd_context.verify(plainPassword,hashedPassword)
 
 def recommendation(userInfo: schemas.UserInfoResponse, users_info:List[schemas.UserInfoResponse]):
-    
-    return cos_sim.get_recommendations(userInfo.dict(),[user_info.dict() for user_info in users_info])
+    pass
+    #return cos_sim.get_recommendations(userInfo.dict(),[user_info.dict() for user_info in users_info])
 
     
 
