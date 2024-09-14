@@ -4,6 +4,7 @@ import sys
 import pathlib
 import json
 from typing import List, Dict, Tuple
+from uuid import UUID
 
 import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer
@@ -26,41 +27,44 @@ def vectorize(info: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: A vectorized DataFrame with numerical and one-hot encoded categorical columns.
     """
 
-    # Map experienceLevel to numerical values
-    experience_map = {'beginner': 1, 'intermediate': 2, 'expert': 3}
-    info['experienceLevel'] = info['experienceLevel'].map(experience_map)
+    if not info.empty:
+        # Map experienceLevel to numerical values
+        experience_map = {'beginner': 1, 'intermediate': 2, 'expert': 3}
+        info['experienceLevel'] = info['experienceLevel'].map(experience_map)
 
-    # One-Hot Encoding for categorical columns
-    categorical_cols = ['role2', 'goal', 'trait']
-    df_encoded = pd.get_dummies(info, columns=categorical_cols)
+        # One-Hot Encoding for categorical columns
+        categorical_cols = ['role2', 'goal', 'trait']
+        df_encoded = pd.get_dummies(info, columns=categorical_cols)
 
-    # Use MultiLabelBinarizer for primaryLanguages & secondaryLanguages (lists of programming languages)
-    mlb_primary = MultiLabelBinarizer()
-    primary_languages_encoded = mlb_primary.fit_transform(info['primaryLanguages'])
-    mlb_secondary = MultiLabelBinarizer()
-    secondary_languages_encoded = mlb_secondary.fit_transform(info['secondaryLanguages'])
+        # Use MultiLabelBinarizer for primaryLanguages & secondaryLanguages (lists of programming languages)
+        mlb_primary = MultiLabelBinarizer()
+        primary_languages_encoded = mlb_primary.fit_transform(info['primaryLanguages'])
+        mlb_secondary = MultiLabelBinarizer()
+        secondary_languages_encoded = mlb_secondary.fit_transform(info['secondaryLanguages'])
 
-    # Convert to DataFrame with the correct column names for primaryLanguages & secondaryLanguages
-    primary_languages_df = pd.DataFrame(
-        primary_languages_encoded,
-        columns=[f'primary_{lang}' for lang in mlb_primary.classes_]
-    )
-    secondary_languages_df = pd.DataFrame(
-        secondary_languages_encoded,
-        columns=[f'secondary_{lang}' for lang in mlb_secondary.classes_]
-    )
+        # Convert to DataFrame with the correct column names for primaryLanguages & secondaryLanguages
+        primary_languages_df = pd.DataFrame(
+            primary_languages_encoded,
+            columns=[f'primary_{lang}' for lang in mlb_primary.classes_]
+        )
+        secondary_languages_df = pd.DataFrame(
+            secondary_languages_encoded,
+            columns=[f'secondary_{lang}' for lang in mlb_secondary.classes_]
+        )
 
-    # Concatenate the encoded primary and secondary languages with the original DataFrame
-    vectorizedinfo = pd.concat(
-        [
-            df_encoded.drop(columns=['primaryLanguages', 'secondaryLanguages']),
-            primary_languages_df,
-            secondary_languages_df
-        ],
-        axis=1
-    )
+        # Concatenate the encoded primary and secondary languages with the original DataFrame
+        vectorizedinfo = pd.concat(
+            [
+                df_encoded.drop(columns=['primaryLanguages', 'secondaryLanguages']),
+                primary_languages_df,
+                secondary_languages_df
+            ],
+            axis=1
+        )
 
-    return vectorizedinfo
+        return vectorizedinfo
+    
+    return None
 
 # Function to align columns across differnt DataFrames
 def align_columns(tables: List[pd.DataFrame]) -> List[pd.DataFrame]:
@@ -81,17 +85,27 @@ def align_columns(tables: List[pd.DataFrame]) -> List[pd.DataFrame]:
     """
 
     # Get all unique columns across all tables
-    all_columns = set().union(*[set(table.columns) for table in tables])
+    all_columns = set()
+
+    for table in tables:
+        if table is None:
+            continue
+        else:
+            all_columns = all_columns.union(set(table.columns))
+    # all_columns = set().union(*[set(table.columns) for table in tables])
 
     # Add missing columns to each table and reorder columns
     aligned_tables = []
 
     for table in tables:
-        missing_cols = all_columns - set(table.columns)
-        for col in missing_cols:
-            table[col] = 0  # Add missing columns with value 0
-        table = table.reindex(sorted(all_columns), axis=1)  # Reorder columns to ensure consistency
-        aligned_tables.append(table)
+        if table is None:
+            aligned_tables.append(None)
+        else:
+            missing_cols = all_columns - set(table.columns)
+            for col in missing_cols:
+                table[col] = 0  # Add missing columns with value 0
+            table = table.reindex(sorted(all_columns), axis=1)  # Reorder columns to ensure consistency
+            aligned_tables.append(table)
 
     return aligned_tables
 
@@ -159,63 +173,47 @@ def compare_cos_sim(
 
     # Iterate over each role-based DataFrame
     for key, vec_table in vec_tables.items():
-        id_frame = vec_table[['userId', 'name', 'role1']]
-        
-        # Separate feature columns from identifier columns
-        vec_table_features = vec_table.drop(columns=id_columns, errors='ignore')  # Use only feature columns
-        vec_table_identifiers = vec_table[id_columns]  # Keep the identifier columns
+        if vec_table is not None:
+            id_frame = vec_table[['userId', 'name', 'role1']]
+            
+            # Separate feature columns from identifier columns
+            vec_table_features = vec_table.drop(columns=id_columns, errors='ignore')  # Use only feature columns
+            vec_table_identifiers = vec_table[id_columns]  # Keep the identifier columns
 
-        # Apply weight to experienceLevel column
-        vec_table_features['experienceLevel'] *= experience_weight
-        user_vector['experienceLevel'] *= experience_weight
+            # Apply weight to experienceLevel column
+            vec_table_features['experienceLevel'] *= experience_weight
+            user_vector['experienceLevel'] *= experience_weight
 
-        # Compute cosine similarity
-        vec_table_vectors = vec_table_features.values
-        user_vector_values = user_vector.drop(columns=id_columns, errors='ignore').values
+            # Compute cosine similarity
+            vec_table_vectors = vec_table_features.values
+            user_vector_values = user_vector.drop(columns=id_columns, errors='ignore').values
 
-        similarity_scores = cosine_similarity(user_vector_values, vec_table_vectors).flatten()
+            similarity_scores = cosine_similarity(user_vector_values, vec_table_vectors).flatten()
 
-        # Add similarity scores to the DataFrame
-        vec_table_features['similarity'] = similarity_scores
-        vec_table_features = pd.concat([vec_table_features, id_frame], axis=1)
+            # Add similarity scores to the DataFrame
+            vec_table_features['similarity'] = similarity_scores
+            vec_table_features = pd.concat([vec_table_features, id_frame], axis=1)
 
-        # Sort by similarity
-        sorted_table = vec_table_features.sort_values(by='similarity', ascending=False).reset_index(drop=True)
+            # Sort by similarity
+            sorted_table = vec_table_features.sort_values(by='similarity', ascending=True).reset_index(drop=True)
 
-        role_similarity_results[key] = sorted_table
+            role_similarity_results[key] = sorted_table
 
     return role_similarity_results
 
+# Function to make all letters lowercase
+def to_lowercase(x):
+    # If the value is a string, convert it to lowercase
+    if isinstance(x, str):
+        return x.lower()
+    # If the value is a list of strings, convert each element to lowercase
+    elif isinstance(x, list):
+        return [item.lower() if isinstance(item, str) else item for item in x]
+    # If it's something else, return it unchanged
+    return x
+
 # FUNCTION TO GET RECOMMENDATIONS
 def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
-    """
-    Generates role-based user recommendations by calculating the cosine similarity 
-    between a given user and all other users across different roles, then returns 
-    a list of recommendations sorted by similarity for each role.
-
-    Args:
-        info (Dict): A dictionary containing information about the current user, 
-            including their profile data (such as role, experience level, etc.).
-        allUsers (List[Dict]): A list of dictionaries where each dictionary represents 
-            a user, containing user information such as roles, languages, goals, and traits.
-
-    Returns:
-        Tuple[List[Dict]]: A tuple containing four lists of dictionaries, each list 
-            representing recommended users for the roles 'data science', 'back-end', 
-            'front-end', and 'business'. Each dictionary in the list contains 
-            information about the recommended user, such as name, experience level, 
-            roles, languages, school, goal, and more.
-    
-    Notes:
-        - The function first categorizes all users into their respective roles ('data science', 
-          'back-end', 'front-end', and 'business').
-        - Then it vectorizes user data (dropping unnecessary columns) to calculate 
-          the cosine similarity between the target user and all other users in each role.
-        - The `compare_cos_sim` function is used to compute the similarity and return 
-          sorted recommendations for each role.
-        - The final output is a tuple containing four lists of recommendations, one for each role.
-    """
-    
     # Create empty DataFrame for each role
     data_science = pd.DataFrame()
     backend = pd.DataFrame()
@@ -224,7 +222,8 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
 
     # Put users in the correct role bucket
     for user in allUsers:
-        data = pd.DataFrame([user])
+        data = pd.DataFrame([user]).apply(to_lowercase)
+        
         if user['role1'] == 'data science':
             data_science = pd.concat([data_science, data], ignore_index=True)
         elif user['role1'] == 'back-end':
@@ -268,8 +267,13 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
         "business": vec_tables[3]
     }
 
+    for table in vec_tables:
+        if table is not None:
+            reference_columns = table.columns
+
     # Convert the dictionary to Pandas DataFrame and get user's goal
-    user = pd.DataFrame([info])
+    user = pd.DataFrame([info]).apply(to_lowercase)
+    
     userGoal = user['goal'].iloc[0]
 
     # Get the vector for the user
@@ -278,7 +282,7 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
             columns=['school', 'note', 'discordLink'],
             errors='ignore'
         ),
-        reference_columns=vec_tables[0].columns
+        reference_columns=reference_columns
     )
 
     # Compare cosine similarity between the user and rows with different primary roles
@@ -292,40 +296,52 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
     output = []
 
     for role, table in sorted_similarity_tables.items():
-        recommendations = []
+        if table is not None:
+            recommendations = []
 
-        for i, row in table.iterrows():
-            id = row['userId']
-            
-            if role == 'data science':
-                matching_row = data_science[data_science['userId'] == id]
-            elif role == 'back-end':
-                matching_row = backend[backend['userId'] == id]
-            elif role == 'front-end':
-                matching_row = frontend[frontend['userId'] == id]
-            elif role == 'business':
-                matching_row = business[business['userId'] == id]
+            for i, row in table.iterrows():
+                id = row['userId']
                 
-            recommendations.append(
-                {
-                    "userId": matching_row['userId'].iloc[0],
-                    "name": matching_row['name'].values[0],
-                    "experienceLevel": matching_row['experienceLevel'].values[0],
-                    "role1": matching_row['role1'].values[0],
-                    "role2": matching_row['role2'].values[0],
-                    "primaryLanguages": matching_row['primaryLanguages'].values[0],
-                    "secondaryLanguages": matching_row['secondaryLanguages'].values[0],
-                    "school": matching_row['school'].values[0],
-                    "goal": matching_row['goal'].values[0],
-                    "note": matching_row['note'].values[0],
-                    "trait": matching_row['trait'].values[0],
-                    "discordLink": matching_row['discordLink'].values[0]
-                }
-            )
+                if role == 'data science':
+                    matching_row = data_science[data_science['userId'] == id]
+                elif role == 'back-end':
+                    matching_row = backend[backend['userId'] == id]
+                elif role == 'front-end':
+                    matching_row = frontend[frontend['userId'] == id]
+                elif role == 'business':
+                    matching_row = business[business['userId'] == id]
+                    
+                recommendations.append(
+                    {
+                        "userId": matching_row['userId'].iloc[0],
+                        "name": matching_row['name'].values[0],
+                        "experienceLevel": matching_row['experienceLevel'].values[0],
+                        "role1": matching_row['role1'].values[0],
+                        "role2": matching_row['role2'].values[0],
+                        "primaryLanguages": matching_row['primaryLanguages'].values[0],
+                        "secondaryLanguages": matching_row['secondaryLanguages'].values[0],
+                        "school": matching_row['school'].values[0],
+                        "goal": matching_row['goal'].values[0],
+                        "note": matching_row['note'].values[0],
+                        "trait": matching_row['trait'].values[0],
+                        "discordLink": matching_row['discordLink'].values[0]
+                    }
+                )
 
-        # Append the recommendations for each role to the output
-        output.append(recommendations)
+            # Append the recommendations for each role to the output
+            output.append(recommendations)
+        else:
+            output.append([])
 
+    count = 0
+
+    for roleList in output:
+        if roleList is not None and len(roleList) == 1:
+            count += 1
+
+    if count == 1:
+        return [], [], [], []
+        
     return output[0], output[1], output[2], output[3]
 
 if __name__ == '__main__':
@@ -339,14 +355,44 @@ if __name__ == '__main__':
     
     # Read in the input and an example
     with open(os.path.join(USERDATA, 'rocco.json'), 'r') as file:
-        example = json.load(file)
+        info = json.load(file)
 
     with open(os.path.join(USERDATA, 'input.json'), 'r') as inFile:
         allUsers = json.load(inFile)
 
+    # Specific test case
+    info = {
+        'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'),
+        'name': 'Vishak Vikranth',
+        'experienceLevel': 'expert',
+        'role1': 'back-end',
+        'role2': 'data Science',
+        'primaryLanguages': ['Python', 'Java', 'Go'],
+        'secondaryLanguages': ['C#', 'SQL', 'R'],
+        'school': 'The University of Alabama',
+        'goal': 'new goal',
+        'note': None,
+        'trait': None,
+        'discordLink': None
+    } 
+    allUsers = [{
+        'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'),
+        'name': 'Vishak Vikranth',
+        'experienceLevel': 'expert',
+        'role1': 'back-end',
+        'role2': 'data Science',
+        'primaryLanguages': ['Python', 'Java', 'Go'],
+        'secondaryLanguages': ['C#', 'SQL', 'R'],
+        'school': 'The University of Alabama',
+        'goal': 'new goal',
+        'note': None,
+        'trait': None,
+        'discordLink': None
+    }]
+
     # Get recommendations
     data_science_list, backend_list, frontend_list, business_list = get_recommendations(
-        info=example,
+        info=info,
         allUsers=allUsers
     )
 

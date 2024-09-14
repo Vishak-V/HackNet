@@ -61,9 +61,10 @@ class UserInfoResponse(BaseModel):
 
 class PossibleMatches(BaseModel):
     
-    q1: List[UserInfoResponse]
-    q2: List[UserInfoResponse]
-    q3: List[UserInfoResponse]
+    dataScience : List[UserInfoResponse]
+    backend: List[UserInfoResponse]
+    frontend: List[UserInfoResponse]
+    business: List[UserInfoResponse]
     
 class MatchAdd(BaseModel):
     user2Id: UUID

@@ -46,9 +46,9 @@ def get_possible_matches(db: Session=Depends(get_db),currentUser: schemas.UserRe
 
     # Ensure the return type fits the schema
     return {
-        "data science": [schemas.UserInfoResponse.model_validate(vars(user)) for user in dataScience],
-        "back-end": [schemas.UserInfoResponse.model_validate(vars(user)) for user in backend],
-        "front-end": [schemas.UserInfoResponse.model_validate(vars(user)) for user in frontend],
+        "dataScience": [schemas.UserInfoResponse.model_validate(vars(user)) for user in dataScience],
+        "backend": [schemas.UserInfoResponse.model_validate(vars(user)) for user in backend],
+        "frontend": [schemas.UserInfoResponse.model_validate(vars(user)) for user in frontend],
         "business": [schemas.UserInfoResponse.model_validate(vars(user)) for user in business]
     }
 
