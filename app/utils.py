@@ -9,7 +9,7 @@ def hash(password: str):
 def verifyPassword(plainPassword: str,hashedPassword: str):
     return pwd_context.verify(plainPassword,hashedPassword)
 
-def recommendation(userInfo: schemas.UserInfoResponse):
+def recommendation(userInfo: schemas.UserInfoResponse, users_info):
     # This function should return a list of possible matches based on the user's responses
     # The list should be in the form of a PossibleMatches object
     pass

@@ -21,8 +21,8 @@ def get_possible_matches(db: Session=Depends(get_db),currentUser: UUID = Depends
     user_info = db.query(models.UserInfo).filter(models.UserInfo.userId == currentUser).first()
     if not user_info:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User info not found")
-
-    q1,q2,q3,q4=utils.recommendation(user_info)
+    users_info = db.query(models.UserInfo).all()
+    q1,q2,q3,q4=utils.recommendation(user_info,users_info)
 
     existingMatches=db.query(models.Matches).filter(models.Matches.user1Id==currentUser).all()
     existingMatches=[match.user2Id for match in existingMatches]
