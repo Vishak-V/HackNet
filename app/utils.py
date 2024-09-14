@@ -90,7 +90,7 @@ async def parse(pdfFile):
     Extract the following details and output in the following JSON schema:
     
 
-    Choose role1 and role2 from the following: front-end, back-end, data Science, business
+    Choose role1 and role2 from the following: front-end, back-end, data science, business
     For languages choose 3 strongest languages as primaryLanguages related to role1 and 3 other languages as secondaryLanguages related to role2
     Experience level should be the experience level for attending an hackathon, choose from beginner, intermediate, expert. Limit your answer to
 
@@ -106,5 +106,7 @@ async def getScore(roster:List[schemas.UserInfoResponse]):
                     Here is the list - {roster}
                     """
     response=await get_gemini_repsonse_roster(input_prompt)
+
+    print(response)
     
     return response

@@ -34,9 +34,11 @@ def get_confirmed_matches(db: Session=Depends(get_db),currentUser: schemas.UserR
     return users_info_pydantic
 
 @router.post("/",response_model=schemas.UserInfoResponse)
-def get_team_score(roster=schemas.Roster,db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
+def get_team_score(roster:schemas.Roster,db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
 
-    currentUserInfo=db.query(models.UserInfo).filter(models.UserInfo==currentUser.id).first()
+    currentUserInfo=db.query(models.UserInfo).filter(models.UserInfo.userId==currentUser.id).first()
+
+    currentUserInfo=schemas.UserInfoResponse.model_validate(currentUserInfo.__dict__)
 
     currentRoster=[currentUserInfo,roster.user1,roster.user2,roster.user3]
 
