@@ -27,12 +27,12 @@ def get_possible_matches(db: Session=Depends(get_db),currentUser: UUID = Depends
     existingMatches=db.query(models.Matches).filter(models.Matches.user1Id==currentUser).all()
     existingMatches=[match.user2Id for match in existingMatches]
 
-    q1=[userInfo for userInfo in q1 if userInfo.userId not in existingMatches]
-    q2=[userInfo for userInfo in q2 if userInfo.userId not in existingMatches]
-    q3=[userInfo for userInfo in q3 if userInfo.userId not in existingMatches]
-    q4=[userInfo for userInfo in q4 if userInfo.userId not in existingMatches]
+    dataScience=[userInfo for userInfo in q1 if userInfo.userId not in existingMatches]
+    backend=[userInfo for userInfo in q2 if userInfo.userId not in existingMatches]
+    frontend=[userInfo for userInfo in q3 if userInfo.userId not in existingMatches]
+    business=[userInfo for userInfo in q4 if userInfo.userId not in existingMatches]
 
-    return {"q1":q1,"q2":q2,"q3":q3,"q4":q4}
+    return {"data science":dataScience,"back-end":backend,"front-end":frontend,"business":business}
 
 
 @router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.MatchResponse)
