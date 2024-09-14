@@ -51,7 +51,7 @@ class UserInfoResponse(BaseModel):
     school: Optional[str] = None
     goal: Optional[str] = None
     note: Optional[str] = None
-    trait: str = None
+    trait: Optional[str] = None
     discordLink: Optional[str] = None
 
     class Config:
