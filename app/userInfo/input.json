@@ -9,9 +9,9 @@
         "secondaryLanguages": ["react", "javascript", "next.js"],
         "school": "ua",
         "goal": "win hackathon",
-        "note": "optional here",
+        "note": "looking forward to the challenge!",
         "trait": "efficient",
-        "discordLink": "discord link here"
+        "discordLink": "https://discord.gg/1ld1cei9"
     },
     {
         "userId": 23456781,
@@ -23,9 +23,9 @@
         "secondaryLanguages": ["python", "sql", "r"],
         "school": "ua",
         "goal": "win hackathon",
-        "note": "optional here",
+        "note": "let's win this!",
         "trait": "flexible",
-        "discordLink": "discord link here"
+        "discordLink": "https://discord.gg/ga9qzwxk"
     },
     {
         "userId": 34567812,
@@ -37,9 +37,9 @@
         "secondaryLanguages": ["python", "sql", "r"],
         "school": "ua",
         "goal": "have fun",
-        "note": "optional here",
+        "note": "collaboration is key!",
         "trait": "analytical",
-        "discordLink": "discord link here"
+        "discordLink": "https://discord.gg/8lj0jd39"
     },
     {
         "userId": 45678123,
@@ -51,9 +51,9 @@
         "secondaryLanguages": ["python", "sql", "postgresql"],
         "school": "ua",
         "goal": "networking",
-        "note": "optional here",
+        "note": "excited to work with the team!",
         "trait": "collaborative",
-        "discordLink": "discord link here"
+        "discordLink": "https://discord.gg/qzl8cxio"
     },
     {
         "userId": 56781234,
@@ -65,9 +65,9 @@
         "secondaryLanguages": ["c++", "c", "java"],
         "school": "ua",
         "goal": "gain experience",
-        "note": "optional here",
+        "note": "ready to give my best!",
         "trait": "analytical",
-        "discordLink": "discord link here"
+        "discordLink": "https://discord.gg/dictwb6h"
     },
     {
         "userId": 67812345,
@@ -79,9 +79,9 @@
         "secondaryLanguages": ["powerpoint", "c#", "excel"],
         "school": "ua",
         "goal": "gain experience",
-        "note": "optional here",
+        "note": "hackathons are fun!",
         "trait": "collaborative",
-        "discordLink": "discord link here"
+        "discordLink": "https://discord.gg/3774f7fg"
     },
     {
         "userId": 78123456,
@@ -93,9 +93,9 @@
         "secondaryLanguages": ["java", "python", "node.js"],
         "school": "ua",
         "goal": "networking",
-        "note": "optional here",
+        "note": "networking is a priority!",
         "trait": "flexible",
-        "discordLink": "discord link here"
+        "discordLink": "https://discord.gg/rkuww3a4"
     },
     {
         "userId": 81234567,
@@ -107,8 +107,204 @@
         "secondaryLanguages": ["c#", "tableau", "sql"],
         "school": "ua",
         "goal": "networking",
-        "note": "optional here",
+        "note": "gaining new experience is the goal!",
         "trait": "efficient",
-        "discordLink": "discord link here"
+        "discordLink": "https://discord.gg/vsqhreob"
+    },
+    {
+        "userId": 84437779,
+        "name": "lucas",
+        "experienceLevel": "expert",
+        "role1": "front-end",
+        "role2": "back-end",
+        "primaryLanguages": ["html", "typescript"],
+        "secondaryLanguages": ["go", "c++"],
+        "school": "uchicago",
+        "goal": "have fun",
+        "note": "excited to participate!",
+        "trait": "analytical",
+        "discordLink": "https://discord.gg/pxl1i2b7"
+    },
+    {
+        "userId": 58213874,
+        "name": "nina",
+        "experienceLevel": "beginner",
+        "role1": "data science",
+        "role2": "business",
+        "primaryLanguages": ["sql"],
+        "secondaryLanguages": ["powerpoint", "sql", "tableau"],
+        "school": "yale",
+        "goal": "gain experience",
+        "note": "looking forward to collaborating.",
+        "trait": "efficient",
+        "discordLink": "https://discord.gg/213doc8y"
+    },
+    {
+        "userId": 32944624,
+        "name": "shiv",
+        "experienceLevel": "beginner",
+        "role1": "data science",
+        "role2": "back-end",
+        "primaryLanguages": ["r", "python"],
+        "secondaryLanguages": ["c++", "java", "go"],
+        "school": "stanford",
+        "goal": "networking",
+        "note": "excited to participate!",
+        "trait": "collaborative",
+        "discordLink": "https://discord.gg/213doc8y"
+    },
+    {
+        "userId": 12704537,
+        "name": "aaron",
+        "experienceLevel": "beginner",
+        "role1": "data science",
+        "role2": "back-end",
+        "primaryLanguages": ["python", "sql"],
+        "secondaryLanguages": ["java", "go", "c++"],
+        "school": "ucla",
+        "goal": "gain experience",
+        "note": "ready to win!",
+        "trait": "efficient",
+        "discordLink": "https://discord.gg/282zzxy7"
+    },
+    {
+        "userId": 58306961,
+        "name": "mira",
+        "experienceLevel": "beginner",
+        "role1": "back-end",
+        "role2": "data science",
+        "primaryLanguages": ["go", "java"],
+        "secondaryLanguages": ["python", "sql"],
+        "school": "ucla",
+        "goal": "win hackathon",
+        "note": "ready to win!",
+        "trait": "efficient",
+        "discordLink": "https://discord.gg/282zzxy7"
+    },
+    {
+        "userId": 24582318,
+        "name": "david",
+        "experienceLevel": "beginner",
+        "role1": "front-end",
+        "role2": "back-end",
+        "primaryLanguages": ["react"],
+        "secondaryLanguages": ["java"],
+        "school": "harvard",
+        "goal": "gain experience",
+        "note": "let's have fun!",
+        "trait": "collaborative",
+        "discordLink": "https://discord.gg/tjklkgpv"
+    },
+    {
+        "userId": 93122436,
+        "name": "evan",
+        "experienceLevel": "intermediate",
+        "role1": "back-end",
+        "role2": "data science",
+        "primaryLanguages": ["go", "java"],
+        "secondaryLanguages": ["sql", "r"],
+        "school": "uc berkeley",
+        "goal": "gain experience",
+        "note": "gaining new experience is the goal!",
+        "trait": "analytical",
+        "discordLink": "https://discord.gg/iji9e1py"
+    },
+    {
+        "userId": 92768702,
+        "name": "sophia",
+        "experienceLevel": "intermediate",
+        "role1": "data science",
+        "role2": "back-end",
+        "primaryLanguages": ["sql"],
+        "secondaryLanguages": ["go", "c++", "java"],
+        "school": "stanford",
+        "goal": "gain experience",
+        "note": "hackathons are fun!",
+        "trait": "flexible",
+        "discordLink": "https://discord.gg/2cdi6jrv"
+    },
+    {
+        "userId": 52123765,
+        "name": "jacob",
+        "experienceLevel": "expert",
+        "role1": "back-end",
+        "role2": "business",
+        "primaryLanguages": ["c++"],
+        "secondaryLanguages": ["sql"],
+        "school": "yale",
+        "goal": "have fun",
+        "note": "ready to give my best!",
+        "trait": "flexible",
+        "discordLink": "https://discord.gg/2gnisut6"
+    },
+    {
+        "userId": 32916685,
+        "name": "emma",
+        "experienceLevel": "expert",
+        "role1": "data science",
+        "role2": "back-end",
+        "primaryLanguages": ["python", "r"],
+        "secondaryLanguages": ["java", "c++", "go"],
+        "school": "princeton",
+        "goal": "have fun",
+        "note": "excited to work with the team!",
+        "trait": "collaborative",
+        "discordLink": "https://discord.gg/rlop9xqu"
+    },
+    {
+        "userId": 96333118,
+        "name": "liam",
+        "experienceLevel": "intermediate",
+        "role1": "business",
+        "role2": "back-end",
+        "primaryLanguages": ["excel", "sql"],
+        "secondaryLanguages": ["typescript", "javascript"],
+        "school": "nyu",
+        "goal": "have fun",
+        "note": "excited to work with the team!",
+        "trait": "flexible",
+        "discordLink": "https://discord.gg/vym512ki"
+    },
+    {
+        "userId": 64070762,
+        "name": "olivia",
+        "experienceLevel": "expert",
+        "role1": "business",
+        "role2": "back-end",
+        "primaryLanguages": ["tableau", "sql", "powerpoint"],
+        "secondaryLanguages": ["go", "c++", "java"],
+        "school": "stanford",
+        "goal": "win hackathon",
+        "note": "hackathons are fun!",
+        "trait": "collaborative",
+        "discordLink": "https://discord.gg/o2uvcqz8"
+    },
+    {
+        "userId": 17796148,
+        "name": "noah",
+        "experienceLevel": "expert",
+        "role1": "front-end",
+        "role2": "data science",
+        "primaryLanguages": ["css"],
+        "secondaryLanguages": ["sql", "r", "python"],
+        "school": "princeton",
+        "goal": "have fun",
+        "note": "gaining new experience is the goal!",
+        "trait": "flexible",
+        "discordLink": "https://discord.gg/esjtrsuk"
+    },
+    {
+        "userId": 36965579,
+        "name": "ava",
+        "experienceLevel": "beginner",
+        "role1": "back-end",
+        "role2": "data science",
+        "primaryLanguages": ["java", "c++", "go"],
+        "secondaryLanguages": ["sql", "python", "r"],
+        "school": "harvard",
+        "goal": "win hackathon",
+        "note": "looking forward to the challenge!",
+        "trait": "flexible",
+        "discordLink": "https://discord.gg/gihpcx40"
     }
 ]

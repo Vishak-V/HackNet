@@ -16,26 +16,23 @@ warnings.filterwarnings('ignore')
 # Function to vectorize DataFrames
 def vectorize(info: pd.DataFrame) -> pd.DataFrame:
     """
-    Vectorizes a given DataFrame by applying one-hot encoding to categorical columns and multi-label binarization
-    to language columns.
-
-    This function processes the following columns:
-    - One-hot encodes the categorical columns: 'experienceLevel', 'role2', 'goal', 'trait'.
-    - Applies `MultiLabelBinarizer` to 'primaryLanguages' and 'secondaryLanguages' (which contain lists of languages).
-    - Concatenates the one-hot encoded and binarized columns with the rest of the DataFrame.
+    Vectorizes a given DataFrame by encoding experienceLevel numerically and applying one-hot encoding
+    to categorical columns and multi-label binarization to language columns.
 
     Args:
         info (pd.DataFrame): A DataFrame containing user information with columns such as 'experienceLevel',
                              'role2', 'goal', 'trait', 'primaryLanguages', and 'secondaryLanguages'.
 
     Returns:
-        pd.DataFrame: A vectorized DataFrame with one-hot encoded categorical columns and binarized language columns.
-                      The original 'primaryLanguages' and 'secondaryLanguages' columns are replaced with the 
-                      respective binarized columns, and other columns remain unchanged.
+        pd.DataFrame: A vectorized DataFrame with numerical and one-hot encoded categorical columns.
     """
 
+    # Map experienceLevel to numerical values
+    experience_map = {'beginner': 1, 'intermediate': 2, 'expert': 3}
+    info['experienceLevel'] = info['experienceLevel'].map(experience_map)
+
     # One-Hot Encoding for categorical columns
-    categorical_cols = ['experienceLevel', 'role2', 'goal', 'trait']
+    categorical_cols = ['role2', 'goal', 'trait']
     df_encoded = pd.get_dummies(info, columns=categorical_cols)
 
     # Use MultiLabelBinarizer for primaryLanguages & secondaryLanguages (lists of programming languages)
@@ -133,41 +130,30 @@ def align_single_user(user_vector: pd.DataFrame, reference_columns: pd.Index) ->
 # Function to compute least cosine similarity and sort by similarity score for each role
 def compare_cos_sim(
     user_vector: pd.DataFrame,
-    vec_tables: Dict[str, pd.DataFrame]
+    vec_tables: Dict[str, pd.DataFrame],
+    user_goal: str,
 ) -> Dict[str, pd.DataFrame]:
     """
-    Computes the least cosine similarity between a user vector and a set of role-based 
-    feature vectors, then sorts each role's feature vectors by their similarity to 
-    the user vector in ascending order (least similar first).
+    Computes the cosine similarity between a user vector and a set of role-based feature vectors,
+    applying dynamic weighting based on the user's goal.
 
     Args:
-        user_vector (pd.DataFrame): A DataFrame containing the user's vector, 
-            including both feature columns and identifier columns (e.g., 'userId', 
-            'name', 'role1').
-        vec_tables (Dict[str, pd.DataFrame]): A dictionary where each key represents 
-            a role (e.g., 'role1', 'role2'), and each value is a DataFrame containing 
-            feature vectors of individuals with that role. The DataFrames should also 
-            contain identifier columns.
+        user_vector (pd.DataFrame): The vectorized DataFrame of the user's features.
+        vec_tables (Dict[str, pd.DataFrame]): Dictionary of role-based feature vectors.
+        user_goal (str): The goal of the user, which influences the weighting of experienceLevel.
 
     Returns:
-        Dict[str, pd.DataFrame]: A dictionary where each key corresponds to a role, 
-            and each value is a DataFrame. Each DataFrame contains the original 
-            identifier columns, the feature vectors, and an additional 'similarity' 
-            column representing cosine similarity between the user's vector and the 
-            feature vectors. The DataFrames are sorted in ascending order of similarity 
-            (i.e., least similar entries come first).
-    
-    Notes:
-        - The `id_columns` variable contains column names such as 'userId', 'name', 
-          and 'role1', which are identifiers and will be excluded from similarity 
-          calculations.
-        - Cosine similarity is computed using only the feature columns, and the results 
-          are added to the DataFrame as a 'similarity' column.
-        - The resulting DataFrames for each role are sorted by similarity score in 
-          ascending order (least similar first) and then returned in the dictionary.
+        Dict[str, pd.DataFrame]: Sorted DataFrame by cosine similarity for each role.
     """
 
     role_similarity_results = {}
+
+    # Weighting matrix for experienceLevel based on goal
+    experience_weight = 1.0  # Default weight
+    if user_goal == 'win hackathon':
+        experience_weight = 2.0  # Prioritize experienceLevel for 'win hackathon'
+    elif user_goal == 'gain experience':
+        experience_weight = 1.5  # Moderate weight for experience matching
 
     # Identifier columns (you want to keep these but not use them in similarity computation)
     id_columns = ['userId', 'name', 'role1']  # Adjust based on your actual columns
@@ -178,26 +164,24 @@ def compare_cos_sim(
         vec_table_features = vec_table.drop(columns=id_columns, errors='ignore')  # Use only feature columns
         vec_table_identifiers = vec_table[id_columns]  # Keep the identifier columns
 
-        # Compute cosine similarity between the user vector and each row in the current table (features)
-        vec_table_vectors = vec_table_features.values  # Get the feature vectors as a matrix
-        user_vector_values = user_vector.drop(columns=id_columns, errors='ignore').values  # Ensure user_vector is in the correct format
+        # Apply weight to experienceLevel column
+        vec_table_features['experienceLevel'] *= experience_weight
+        user_vector['experienceLevel'] *= experience_weight
 
-        # Calculate cosine similarity
+        # Compute cosine similarity
+        vec_table_vectors = vec_table_features.values
+        user_vector_values = user_vector.drop(columns=id_columns, errors='ignore').values
+
         similarity_scores = cosine_similarity(user_vector_values, vec_table_vectors).flatten()
 
-        # Add similarity scores as a new column to the feature table (but not identifiers yet)
+        # Add similarity scores to the DataFrame
         vec_table_features['similarity'] = similarity_scores
 
-        # Sort the feature table by the similarity score in ascending order (least similar first)
+        # Sort by similarity
         sorted_table_features = vec_table_features.sort_values(by='similarity', ascending=True).reset_index(drop=True)
-
-        # Use the sorted indices to reorder the identifiers
         sorted_table_identifiers = vec_table_identifiers.loc[sorted_table_features.index].reset_index(drop=True)
 
-        # Concatenate identifiers and sorted similarity features back together
         sorted_table = pd.concat([sorted_table_identifiers, sorted_table_features], axis=1)
-
-        # Store the sorted DataFrame in the result dictionary
         role_similarity_results[key] = sorted_table
 
     return role_similarity_results
@@ -284,12 +268,13 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
         "business": vec_tables[3]
     }
 
-    # Convert the dictionary to Pandas DataFrame
-    info = pd.DataFrame([info])
+    # Convert the dictionary to Pandas DataFrame and get user's goal
+    user = pd.DataFrame([info])
+    userGoal = user['goal'].iloc[0]
 
     # Get the vector for the user
     userVector = align_single_user(
-        user_vector=vectorize(info=info).drop(
+        user_vector=vectorize(info=user).drop(
             columns=['school', 'note', 'discordLink'],
             errors='ignore'
         ),
@@ -299,7 +284,8 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
     # Compare cosine similarity between the user and rows with different primary roles
     sorted_similarity_tables = compare_cos_sim(
         user_vector=userVector,
-        vec_tables=vec_dict
+        vec_tables=vec_dict,
+        user_goal=userGoal
     )
 
     # Create output
