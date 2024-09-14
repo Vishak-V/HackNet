@@ -169,12 +169,12 @@ def compare_cos_sim(
         experience_weight = 1.5  # Moderate weight for experience matching
 
     # Identifier columns (you want to keep these but not use them in similarity computation)
-    id_columns = ['userId', 'name', 'role1']  # Adjust based on your actual columns
+    id_columns = ['id', 'userId', 'name', 'role1']  # Adjust based on your actual columns
 
     # Iterate over each role-based DataFrame
     for key, vec_table in vec_tables.items():
         if vec_table is not None:
-            id_frame = vec_table[['userId', 'name', 'role1']]
+            id_frame = vec_table[['id', 'userId', 'name', 'role1']]
             
             # Separate feature columns from identifier columns
             vec_table_features = vec_table.drop(columns=id_columns, errors='ignore')  # Use only feature columns
@@ -332,7 +332,8 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
                     matching_row = business[business['userId'] == id]
                     
                 recommendations.append(
-                    {
+                    {   
+                        "id": matching_row['id'].iloc[0],
                         "userId": matching_row['userId'].iloc[0],
                         "name": matching_row['name'].values[0],
                         "experienceLevel": matching_row['experienceLevel'].values[0],
@@ -372,38 +373,41 @@ if __name__ == '__main__':
     with open(os.path.join(USERDATA, 'input.json'), 'r') as inFile:
         allUsers = json.load(inFile)
 
-    # # Specific test case
-    # info = {
-    #     'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'),
-    #     'name': 'Vishak Vikranth',
-    #     'experienceLevel': 'expert',
-    #     'role1': 'back-end',
-    #     'role2': 'data Science',
-    #     'primaryLanguages': ['Python', 'Java', 'Go'],
-    #     'secondaryLanguages': ['C#', 'SQL', 'R'],
-    #     'school': 'The University of Alabama',
-    #     'goal': 'new goal',
-    #     'note': None,
-    #     'trait': None,
-    #     'discordLink': None
-    # } 
-    # allUsers = [{
-    #     'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'),
-    #     'name': 'Vishak Vikranth',
-    #     'experienceLevel': 'expert',
-    #     'role1': 'back-end',
-    #     'role2': 'data Science',
-    #     'primaryLanguages': ['Python', 'Java', 'Go'],
-    #     'secondaryLanguages': ['C#', 'SQL', 'R'],
-    #     'school': 'The University of Alabama',
-    #     'goal': 'new goal',
-    #     'note': None,
-    #     'trait': None,
-    #     'discordLink': None
-    # }]
-
-    info = {'userId': UUID('bcfa567d-b0b1-4ec4-8a77-c1911000378f'), 'name': 'Vishak Vikranth', 'experienceLevel': 'expert', 'role1': 'data Science', 'role2': 'back-end', 'primaryLanguages': ['Python', 'PyTorch', 'TensorFlow'], 'secondaryLanguages': ['R', 'SQL', 'Scikit-learn'], 'school': 'University of Alabama', 'goal': None, 'note': None, 'trait': None, 'discordLink': None, 'imageLink': None}
-    allUsers = [{'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'), 'name': 'Vishak Vikranth', 'experienceLevel': 'expert', 'role1': 'back-end', 'role2': 'data Science', 'primaryLanguages': ['Python', 'Java', 'Go'], 'secondaryLanguages': ['C#', 'SQL', 'R'], 'school': 'The University of Alabama', 'goal': 'new goal', 'note': None, 'trait': None, 'discordLink': None, 'imageLink': None}, {'userId': UUID('bb65f2ed-af88-4cf3-b73f-5c6dd6b662ae'), 'name': 'Vishak Vikranth', 'experienceLevel': 'expert', 'role1': 'front-end', 'role2': 'data Science', 'primaryLanguages': ['JavaScript', 'React', 'React Native'], 'secondaryLanguages': ['Python', 'C++', 'C'], 'school': 'THE UNIVERSITY OF ALABAMA', 'goal': None, 'note': None, 'trait': None, 'discordLink': None, 'imageLink': None}, {'userId': UUID('bb65f2ed-af88-4cf3-b73f-5c6dd6b662ae'), 'name': 'Vishak Vikranth', 'experienceLevel': 'expert', 'role1': 'back-end', 'role2': 'data science', 'primaryLanguages': ['C++', 'Go', 'Python'], 'secondaryLanguages': ['JavaScript', 'SQL', 'MATLAB'], 'school': 'THE UNIVERSITY OF ALABAMA', 'goal': None, 'note': None, 'trait': None, 'discordLink': None, 'imageLink': None}]
+    # Test case
+    info = {
+        'id': UUID('c01f12d9-5da3-478f-bd30-f6e6c8130975'),
+        'userId': UUID('0e70d649-c442-448d-b86f-e4dfbbcf8fbc'),
+        'name': 'Vishak Vikranth',
+        'experienceLevel': 'intermediate',
+        'role1': 'back-end',
+        'role2': 'data Science',
+        'primaryLanguages': ['Python', 'Java', 'Go'],
+        'secondaryLanguages': ['C/C++', 'SQL', 'R'],
+        'school': 'The University of Alabama',
+        'goal': None,
+        'note': None,
+        'trait': None,
+        'discordLink': None,
+        'imageLink': None
+    }
+    allUsers = [
+        {
+            'id': UUID('b14b2c7c-2a04-4f40-b79a-2a40e2b477ab'),
+            'userId': UUID('56f597ed-e433-4063-9712-29728ba1769e'),
+            'name': 'Vishak Vikranth',
+            'experienceLevel': 'expert',
+            'role1': 'back-end',
+            'role2': 'data science',
+            'primaryLanguages': ['C++', 'Python', 'Go'],
+            'secondaryLanguages': ['JavaScript', 'MATLAB', 'R'],
+            'school': 'THE UNIVERSITY OF ALABAMA',
+            'goal': None,
+            'note': None,
+            'trait': None,
+            'discordLink': None,
+            'imageLink': None
+        }
+    ]
 
     # Get recommendations
     data_science_list, backend_list, frontend_list, business_list = get_recommendations(

@@ -62,7 +62,8 @@ def create_match(match: schemas.MatchAdd,db: Session=Depends(get_db),currentUser
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot match with yourself")
     if db.query(models.Matches).filter(models.Matches.user1Id == newMatch.user1Id, models.Matches.user2Id == newMatch.user2Id).first():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Match already exists")
-    if db.query(models.Matches).filter(models.Matches.user1Id == newMatch.user2Id, models.Matches.user2Id == newMatch.user1Id).first():
+    existingMatch=db.query(models.Matches).filter(models.Matches.user1Id == newMatch.user2Id, models.Matches.user2Id == newMatch.user1Id).first()
+    if existingMatch and existingMatch.matchType==True:
         confirmedMatch = models.ConfirmedMatches(user1Id=newMatch.user1Id,user2Id=newMatch.user2Id)
         db.add(confirmedMatch)
         db.commit()

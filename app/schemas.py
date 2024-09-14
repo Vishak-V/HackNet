@@ -68,6 +68,7 @@ class PossibleMatches(BaseModel):
     
 class MatchAdd(BaseModel):
     user2Id: UUID
+    matchType: bool
     class Config:
         orm_mode=True
 

@@ -49,6 +49,7 @@ class Matches(Base):
     __tablename__ = "matches"
     user1Id = Column(UUID(as_uuid=True),  ForeignKey('users.id', ondelete="CASCADE"), primary_key=True, nullable=False)
     user2Id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete="CASCADE"), primary_key=True, nullable=False)
+    matchType=Column(bool)
     dateMatched = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     class Config:
         orm_mode=True
