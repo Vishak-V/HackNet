@@ -198,6 +198,8 @@ def compare_cos_sim(
             sorted_table = vec_table_features.sort_values(by='similarity', ascending=True).reset_index(drop=True)
 
             role_similarity_results[key] = sorted_table
+        else:
+            role_similarity_results[key] = None
 
     return role_similarity_results
 
@@ -225,6 +227,9 @@ def return_dummy(ds: pd.DataFrame, be: pd.DataFrame, fe: pd.DataFrame, bs: pd.Da
 
 # FUNCTION TO GET RECOMMENDATIONS
 def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
+    if not allUsers:
+        return [], [], [], []
+    
     # Create empty DataFrame for each role
     data_science = pd.DataFrame()
     backend = pd.DataFrame()
@@ -233,29 +238,24 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
 
     # Put users in the correct role bucket
     for user in allUsers:
-        data = pd.DataFrame([user]).apply(to_lowercase)
+        data = pd.DataFrame([user])
         
-        if user['role1'] == 'data science':
+        if data['role1'].iloc[0] == 'data science':
             data_science = pd.concat([data_science, data], ignore_index=True)
-        elif user['role1'] == 'back-end':
+        elif data['role1'].iloc[0] == 'back-end':
             backend = pd.concat([backend, data], ignore_index=True)
-        elif user['role1'] == 'front-end':
+        elif data['role1'].iloc[0] == 'front-end':
             frontend = pd.concat([frontend, data], ignore_index=True)
-        elif user['role1'] == 'business':
+        elif data['role1'].iloc[0] == 'business':
             business = pd.concat([business, data], ignore_index=True)
 
-    # Dummy output for workflow
-    dummy_output = return_dummy(
-        ds=data_science,
-        be=backend,
-        fe=frontend,
-        bs=business
-    )
-
-    return dummy_output[0], dummy_output[1], dummy_output[2], dummy_output[3]
-
     # List of role tables
-    role_tables = [data_science, backend, frontend, business]
+    role_tables = [
+        data_science.applymap(to_lowercase),
+        backend.applymap(to_lowercase),
+        frontend.applymap(to_lowercase),
+        business.applymap(to_lowercase)
+    ]
 
     # DataFrames of new tables used for vectorization
     vec_ds = pd.DataFrame()
@@ -265,7 +265,7 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
 
     # Drop unnecessary columns
     for i, table in enumerate(role_tables):
-        vec_table = table.drop(columns=['school', 'note', 'discordLink'], errors='ignore')
+        vec_table = table.drop(columns=['school', 'note', 'discordLink', 'imageLink'], errors='ignore')
         if i == 0:
             vec_ds = vec_table
         elif i == 1:
@@ -293,8 +293,7 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
             reference_columns = table.columns
 
     # Convert the dictionary to Pandas DataFrame and get user's goal
-    user = pd.DataFrame([info]).apply(to_lowercase)
-    
+    user = pd.DataFrame([info]).applymap(to_lowercase)
     userGoal = user['goal'].iloc[0]
 
     # Get the vector for the user
@@ -354,15 +353,6 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
             output.append(recommendations)
         else:
             output.append([])
-
-    count = 0
-
-    for roleList in output:
-        if roleList is not None and len(roleList) == 1:
-            count += 1
-
-    if count == 1:
-        return [], [], [], []
         
     return output[0], output[1], output[2], output[3]
 
@@ -411,6 +401,9 @@ if __name__ == '__main__':
     #     'trait': None,
     #     'discordLink': None
     # }]
+
+    info = {'userId': UUID('bcfa567d-b0b1-4ec4-8a77-c1911000378f'), 'name': 'Vishak Vikranth', 'experienceLevel': 'expert', 'role1': 'data Science', 'role2': 'back-end', 'primaryLanguages': ['Python', 'PyTorch', 'TensorFlow'], 'secondaryLanguages': ['R', 'SQL', 'Scikit-learn'], 'school': 'University of Alabama', 'goal': None, 'note': None, 'trait': None, 'discordLink': None, 'imageLink': None}
+    allUsers = [{'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'), 'name': 'Vishak Vikranth', 'experienceLevel': 'expert', 'role1': 'back-end', 'role2': 'data Science', 'primaryLanguages': ['Python', 'Java', 'Go'], 'secondaryLanguages': ['C#', 'SQL', 'R'], 'school': 'The University of Alabama', 'goal': 'new goal', 'note': None, 'trait': None, 'discordLink': None, 'imageLink': None}, {'userId': UUID('bb65f2ed-af88-4cf3-b73f-5c6dd6b662ae'), 'name': 'Vishak Vikranth', 'experienceLevel': 'expert', 'role1': 'front-end', 'role2': 'data Science', 'primaryLanguages': ['JavaScript', 'React', 'React Native'], 'secondaryLanguages': ['Python', 'C++', 'C'], 'school': 'THE UNIVERSITY OF ALABAMA', 'goal': None, 'note': None, 'trait': None, 'discordLink': None, 'imageLink': None}, {'userId': UUID('bb65f2ed-af88-4cf3-b73f-5c6dd6b662ae'), 'name': 'Vishak Vikranth', 'experienceLevel': 'expert', 'role1': 'back-end', 'role2': 'data science', 'primaryLanguages': ['C++', 'Go', 'Python'], 'secondaryLanguages': ['JavaScript', 'SQL', 'MATLAB'], 'school': 'THE UNIVERSITY OF ALABAMA', 'goal': None, 'note': None, 'trait': None, 'discordLink': None, 'imageLink': None}]
 
     # Get recommendations
     data_science_list, backend_list, frontend_list, business_list = get_recommendations(
