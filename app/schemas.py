@@ -105,6 +105,21 @@ class UpdateImageLink(BaseModel):
     class Config:
         orm_mode=True
 
+class ConfirmedMatchesInfo(BaseModel):
+    confirmedMatchesInfo:List[UserInfoResponse]
+
+    class Config:
+        orm_mode=True
+
+class Roster(BaseModel):
+    user1: UserInfoResponse
+    user2: UserInfoResponse
+    user3: UserInfoResponse
+
+    class Config:
+        orm_mode=True
+
+
 
     
 

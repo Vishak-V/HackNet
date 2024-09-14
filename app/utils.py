@@ -27,10 +27,26 @@ class UserParsed(typing.TypedDict):
     secondaryLanguages: List[str]
     school: str
 
-async def get_gemini_repsonse(input):
+class TeamScore(BaseModel):
+    depth: str
+    breadth: str
+    diversity: str
+    chemistry: str
+
+
+
+
+async def get_gemini_repsonse_parse(input):
     model=genai.GenerativeModel('gemini-1.5-flash')
     response=model.generate_content(input,generation_config=genai.GenerationConfig(
         response_mime_type="application/json", response_schema=UserParsed, max_output_tokens=100,
+    ),)
+    return response.text
+
+async def get_gemini_repsonse_roster(input):
+    model=genai.GenerativeModel('gemini-1.5-flash')
+    response=model.generate_content(input,generation_config=genai.GenerationConfig(
+        response_mime_type="application/json", response_schema=TeamScore, max_output_tokens=100,
     ),)
     return response.text
 
@@ -85,8 +101,15 @@ async def parse(pdfFile):
 
    """
 
-    response=await get_gemini_repsonse(input_prompt)
+    response=await get_gemini_repsonse_parse(input_prompt)
     
     return response
 
+async def getScore(roster:List[schemas.UserInfoResponse]):
+
+    input_prompt="""You are given a list of hackathon participant information, rate the team on breadth of skill, depth of skill, diversity and team chemistry, 
+                    Here is the list - {roster}
+                    """
+    response=await get_gemini_repsonse_parse(input_prompt)
     
+    return response

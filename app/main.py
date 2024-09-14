@@ -3,7 +3,7 @@ from fastapi import Depends, FastAPI
 from . import models
 from .database import engine
 from passlib.context import CryptContext
-from .routers import user,auth, userInfo, matches
+from .routers import user,auth, userInfo, matches, roster
 from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
 from propelauth_fastapi import init_auth
@@ -32,6 +32,7 @@ app.include_router(user.router)
 app.include_router(auth.router)
 app.include_router(userInfo.router)
 app.include_router(matches.router)
+app.include_router(roster.router)
 
 @app.get("/")
 def read_root():

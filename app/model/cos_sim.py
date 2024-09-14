@@ -212,6 +212,17 @@ def to_lowercase(x):
     # If it's something else, return it unchanged
     return x
 
+# Function to continue the workflow
+def return_dummy(ds: pd.DataFrame, be: pd.DataFrame, fe: pd.DataFrame, bs: pd.DataFrame):
+    return_list = []
+    for df in [ds, be, fe, bs]:
+        if df is None:
+            return_list.append([])
+        else:
+            return_list.append(df.to_dict(orient='records'))
+
+    return return_list
+
 # FUNCTION TO GET RECOMMENDATIONS
 def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
     # Create empty DataFrame for each role
@@ -232,6 +243,16 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
             frontend = pd.concat([frontend, data], ignore_index=True)
         elif user['role1'] == 'business':
             business = pd.concat([business, data], ignore_index=True)
+
+    # Dummy output for workflow
+    dummy_output = return_dummy(
+        ds=data_science,
+        be=backend,
+        fe=frontend,
+        bs=business
+    )
+
+    return dummy_output[0], dummy_output[1], dummy_output[2], dummy_output[3]
 
     # List of role tables
     role_tables = [data_science, backend, frontend, business]
@@ -324,7 +345,8 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
                         "goal": matching_row['goal'].values[0],
                         "note": matching_row['note'].values[0],
                         "trait": matching_row['trait'].values[0],
-                        "discordLink": matching_row['discordLink'].values[0]
+                        "discordLink": matching_row['discordLink'].values[0],
+                        "imageLink": matching_row['imageLink'].values[0]
                     }
                 )
 
@@ -360,35 +382,35 @@ if __name__ == '__main__':
     with open(os.path.join(USERDATA, 'input.json'), 'r') as inFile:
         allUsers = json.load(inFile)
 
-    # Specific test case
-    info = {
-        'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'),
-        'name': 'Vishak Vikranth',
-        'experienceLevel': 'expert',
-        'role1': 'back-end',
-        'role2': 'data Science',
-        'primaryLanguages': ['Python', 'Java', 'Go'],
-        'secondaryLanguages': ['C#', 'SQL', 'R'],
-        'school': 'The University of Alabama',
-        'goal': 'new goal',
-        'note': None,
-        'trait': None,
-        'discordLink': None
-    } 
-    allUsers = [{
-        'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'),
-        'name': 'Vishak Vikranth',
-        'experienceLevel': 'expert',
-        'role1': 'back-end',
-        'role2': 'data Science',
-        'primaryLanguages': ['Python', 'Java', 'Go'],
-        'secondaryLanguages': ['C#', 'SQL', 'R'],
-        'school': 'The University of Alabama',
-        'goal': 'new goal',
-        'note': None,
-        'trait': None,
-        'discordLink': None
-    }]
+    # # Specific test case
+    # info = {
+    #     'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'),
+    #     'name': 'Vishak Vikranth',
+    #     'experienceLevel': 'expert',
+    #     'role1': 'back-end',
+    #     'role2': 'data Science',
+    #     'primaryLanguages': ['Python', 'Java', 'Go'],
+    #     'secondaryLanguages': ['C#', 'SQL', 'R'],
+    #     'school': 'The University of Alabama',
+    #     'goal': 'new goal',
+    #     'note': None,
+    #     'trait': None,
+    #     'discordLink': None
+    # } 
+    # allUsers = [{
+    #     'userId': UUID('ca7d1e14-65b2-4978-9b6b-c5861308e63a'),
+    #     'name': 'Vishak Vikranth',
+    #     'experienceLevel': 'expert',
+    #     'role1': 'back-end',
+    #     'role2': 'data Science',
+    #     'primaryLanguages': ['Python', 'Java', 'Go'],
+    #     'secondaryLanguages': ['C#', 'SQL', 'R'],
+    #     'school': 'The University of Alabama',
+    #     'goal': 'new goal',
+    #     'note': None,
+    #     'trait': None,
+    #     'discordLink': None
+    # }]
 
     # Get recommendations
     data_science_list, backend_list, frontend_list, business_list = get_recommendations(
