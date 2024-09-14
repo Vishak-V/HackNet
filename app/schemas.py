@@ -89,5 +89,8 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     userId: Optional[UUID]=None
     class config:
-        orm_mode=True   
+        orm_mode=True
+
+
+    
 

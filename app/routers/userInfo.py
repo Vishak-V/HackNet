@@ -1,5 +1,8 @@
+from io import BytesIO
+import json
 from uuid import UUID
 from fastapi import Depends,Response,HTTPException,status,APIRouter,File,UploadFile
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app import oauth2
 from ..database import engine,SessionLocal,get_db
@@ -7,7 +10,7 @@ from .. import models,schemas,utils
 from fastapi.encoders import jsonable_encoder
 from fastapi import UploadFile, File,APIRouter,Depends,status,HTTPException
 from typing import List
-from utils import parse
+from ..utils import parse
 
 router=APIRouter(
     prefix="/userinfo",
@@ -30,9 +33,24 @@ async def upload_file(file: UploadFile):
     #Optionally, save the file to a specific location
     # with open(f"/path/to/save/{file.filename}", "wb") as buffer:
     #     buffer.write(file.file.read())
-    parsed=parse(file.file)
-    return parsed
-    return {"filename": file.filename, "content_type": file.content_type}
+    # parsed=parse(file.file)
+    # return parsed
+    file_content = await file.read()
+
+    file_like_object = BytesIO(file_content) 
+    # Pass the file content to the async parse function
+    parsed_data = await parse(file_like_object)
+    #json_data = json.loads(parsed_data)
+    parsed_data = json.loads(str(parsed_data))
+    #json_data = json.loads(parsed_data)
+    
+    # Return it as a JSON response
+    return parsed_data
+    # Return it as a JSON response
+    return parsed_data
+    # Return the parsed data along with file information
+    
+    
 
 @router.get("/",response_model=schemas.UserInfoResponse)
 def get_user_info(db: Session=Depends(get_db),currentUser: UUID = Depends(oauth2.get_current_user)):
