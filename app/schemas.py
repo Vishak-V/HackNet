@@ -35,6 +35,7 @@ class UserInfoAdd(BaseModel):
     primaryLanguages: Optional[List[str]]
     secondaryLanguages: Optional[List[str]]
     discordLink: Optional[str]
+    imageLink: Optional[str]
 
     class Config:
         orm_mode = True
@@ -53,6 +54,7 @@ class UserInfoResponse(BaseModel):
     note: Optional[str] = None
     trait: Optional[str] = None
     discordLink: Optional[str] = None
+    imageLink: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -93,6 +95,11 @@ class TokenData(BaseModel):
 
 class UpdateGoal(BaseModel):
     goal: str
+    class Config:
+        orm_mode=True
+
+class UpdateImageLink(BaseModel):
+    imageLink: str
     class Config:
         orm_mode=True
 
