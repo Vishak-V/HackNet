@@ -333,8 +333,8 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
                     
                 recommendations.append(
                     {   
-                        "id": matching_row['id'].iloc[0],
-                        "userId": matching_row['userId'].iloc[0],
+                        "id": matching_row['id'].values[0],
+                        "userId": matching_row['userId'].values[0],
                         "name": matching_row['name'].values[0],
                         "experienceLevel": matching_row['experienceLevel'].values[0],
                         "role1": matching_row['role1'].values[0],
