@@ -4,7 +4,7 @@ from app import schemas
 import typing_extensions as typing
 import google.generativeai as genai
 
-from model import cos_sim
+from .model import cos_sim
   
 import PyPDF2 as pdf
 from dotenv import load_dotenv

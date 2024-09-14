@@ -25,7 +25,7 @@ def create_user_info(user: schemas.UserInfoAdd,db: Session=Depends(get_db),curre
     db.refresh(newUserInfo)
     return newUserInfo
 
-@router.post("/uploadfile")
+@router.post("/uploadfile",status_code=status.HTTP_201_CREATED,response_model=schemas.UserInfoResponse)
 async def upload_file(file: UploadFile,db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
     if file.content_type != 'application/pdf':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file type")
