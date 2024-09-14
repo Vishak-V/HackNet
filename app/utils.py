@@ -71,7 +71,6 @@ def recommendation(userInfo: schemas.UserInfoResponse, users_info:List[schemas.U
   
         
     # Call the recommendation function (assuming cos_sim.get_recommendations() exists)
-    print(user_dict,users_dicts)
     return cos_sim.get_recommendations(user_dict, users_dicts)
 
     
@@ -106,6 +105,6 @@ async def getScore(roster:List[schemas.UserInfoResponse]):
     input_prompt="""You are given a list of hackathon participant information, rate the team on breadth of skill, depth of skill, diversity and team chemistry, 
                     Here is the list - {roster}
                     """
-    response=await get_gemini_repsonse_parse(input_prompt)
+    response=await get_gemini_repsonse_roster(input_prompt)
     
     return response
