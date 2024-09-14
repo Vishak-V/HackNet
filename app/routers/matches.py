@@ -17,7 +17,7 @@ router=APIRouter(
 @router.get("/",response_model=schemas.PossibleMatches)
 def get_possible_matches(db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
 
-    users_info = db.query(models.UserInfo).all()
+    users_info = db.query(models.UserInfo).filter(models.UserInfo.userId!=currentUser.id).all()
 
     # Convert ORM models to dictionaries and then validate them with Pydantic
     users_info_dicts = [vars(user) for user in users_info]
