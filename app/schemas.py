@@ -120,6 +120,7 @@ class Roster(BaseModel):
     class Config:
         orm_mode=True
 
+
 class TeamScore(BaseModel):
     depth: str
     breadth: str

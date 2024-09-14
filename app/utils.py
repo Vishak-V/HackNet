@@ -1,11 +1,11 @@
-from typing import List
+from typing import Annotated, List
 from passlib.context import CryptContext
 from app import schemas
 import typing_extensions as typing
 import google.generativeai as genai
 
 from .model import cos_sim
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, constr
 import pydantic
 import PyPDF2 as pdf
 from dotenv import load_dotenv
@@ -19,6 +19,11 @@ load_dotenv() ## load all our environment variables
 
 genai.configure(api_key=settings.google_api_key)
 
+Grade = Annotated[
+    str, 
+    Field(min_length=1, max_length=1, description="A grade must be a single letter between A and F")
+]
+
 class UserParsed(typing.TypedDict):
     experienceLevel: str
     role1: str
@@ -28,8 +33,8 @@ class UserParsed(typing.TypedDict):
     school: str
 
 class TeamScore(BaseModel):
-    depth: str
-    breadth: str
+    depth:  str
+    breadth:  str
     diversity: str
     chemistry: str
 
@@ -45,10 +50,21 @@ async def get_gemini_repsonse_parse(input):
 
 async def get_gemini_repsonse_roster(input):
     model=genai.GenerativeModel('gemini-1.5-flash')
-    response=model.generate_content(input,generation_config=genai.GenerationConfig(
-        response_mime_type="application/json", response_schema=TeamScore, max_output_tokens=100,
-    ),)
-    return response.text
+    try:
+        # Request content generation from Gemini with the defined configuration
+        response = model.generate_content(
+            input,
+            generation_config=genai.GenerationConfig(
+                response_mime_type="application/json", 
+                response_schema=TeamScore,  # Ensure TeamScore is a valid Pydantic model
+                max_output_tokens=100
+            ),
+        )
+        return response.text  # Ensure this is the correct attribute you need
+    except Exception as e:
+        # Log and handle errors gracefully
+        print(f"Error during Gemini request: {e}")
+        return None
 
 
 #Prompt Template
@@ -100,13 +116,22 @@ async def parse(pdfFile):
     
     return response
 
-async def getScore(roster:List[schemas.UserInfoResponse]):
+async def getScore(roster):
+    print(roster)
 
-    input_prompt="""You are given a list of hackathon participant information, rate the team on breadth of skill, depth of skill, diversity and team chemistry, 
-                    Here is the list - {roster}
-                    """
-    response=await get_gemini_repsonse_roster(input_prompt)
+    text=""
+    for teammate in roster:
+        text+=teammate.model_dump_json()
+    input_prompt="""You are given a list of hackathon participant information, grade the team from A to D return only one letter on breadth of skill, depth of skill, diversity and team chemistry, 
+                    Here is the list - """ + text
+                    
+    response = await get_gemini_repsonse_roster(input_prompt)
 
-    print(response)
-    
-    return response
+
+    # Return the response or handle it if it's None
+    if response:
+        print(response)
+        return response  # Or parse response if needed (e.g., JSON parsing)
+    else:
+        print("Failed to get response from Gemini")
+        return None
