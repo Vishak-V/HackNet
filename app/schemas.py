@@ -87,6 +87,7 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    needOnboarding: bool
 
 class TokenData(BaseModel):
     userId: Optional[UUID]=None

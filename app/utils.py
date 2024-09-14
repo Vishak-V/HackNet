@@ -4,8 +4,9 @@ from app import schemas
 import typing_extensions as typing
 import google.generativeai as genai
 
-
-  
+from .model import cos_sim
+from pydantic import BaseModel
+import pydantic
 import PyPDF2 as pdf
 from dotenv import load_dotenv
 import json
@@ -47,8 +48,13 @@ def verifyPassword(plainPassword: str,hashedPassword: str):
     return pwd_context.verify(plainPassword,hashedPassword)
 
 def recommendation(userInfo: schemas.UserInfoResponse, users_info:List[schemas.UserInfoResponse]):
-    pass
-    #return cos_sim.get_recommendations(userInfo.dict(),[user_info.dict() for user_info in users_info])
+    print(type(userInfo))
+    user_dict = userInfo.model_dump()
+    
+    users_dicts = [user_info.model_dump() for user_info in users_info]
+
+    # Call the recommendation function (assuming cos_sim.get_recommendations() exists)
+    return cos_sim.get_recommendations(user_dict, users_dicts)
 
     
 

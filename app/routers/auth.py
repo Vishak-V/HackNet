@@ -15,5 +15,9 @@ def login(userCredentials: OAuth2PasswordRequestForm = Depends(),db: Session = D
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Invalid credentials")
     if not utils.verifyPassword(userCredentials.password,user.password):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Invalid password")
+    userInfo=db.query(models.UserInfo).filter(models.UserInfo.userId==user.id).first()
+    needOnboarding=True
+    if userInfo:
+        needOnboarding=False
     accessToken = oauth2.create_access_token(data={"userId": user.id})
-    return {"access_token": accessToken, "token_type": "bearer", "userId": user.id}
+    return {"access_token": accessToken, "token_type": "bearer", "userId": user.id,"needOnboarding":needOnboarding}
