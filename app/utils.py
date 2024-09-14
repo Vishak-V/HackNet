@@ -48,12 +48,18 @@ def verifyPassword(plainPassword: str,hashedPassword: str):
     return pwd_context.verify(plainPassword,hashedPassword)
 
 def recommendation(userInfo: schemas.UserInfoResponse, users_info:List[schemas.UserInfoResponse]):
-    print(type(userInfo))
+    
     user_dict = userInfo.model_dump()
     
     users_dicts = [user_info.model_dump() for user_info in users_info]
 
+    user_dict.pop("id")
+    user_dict.pop("imageLink")
+    for users_dict in users_dicts:
+        users_dict.pop("id")
+        users_dict.pop("imageLink")
     # Call the recommendation function (assuming cos_sim.get_recommendations() exists)
+    print(user_dict,users_dicts)
     return cos_sim.get_recommendations(user_dict, users_dicts)
 
     
