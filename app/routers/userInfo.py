@@ -7,7 +7,7 @@ from .. import models,schemas,utils
 from fastapi.encoders import jsonable_encoder
 from fastapi import UploadFile, File,APIRouter,Depends,status,HTTPException
 from typing import List
-
+from utils import parse
 
 router=APIRouter(
     prefix="/userinfo",
@@ -30,7 +30,8 @@ async def upload_file(file: UploadFile):
     #Optionally, save the file to a specific location
     # with open(f"/path/to/save/{file.filename}", "wb") as buffer:
     #     buffer.write(file.file.read())
-    
+    parsed=parse(file.file)
+    return parsed
     return {"filename": file.filename, "content_type": file.content_type}
 
 @router.get("/",response_model=schemas.UserInfoResponse)

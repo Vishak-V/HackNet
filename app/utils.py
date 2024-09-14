@@ -70,7 +70,7 @@ def recommendation(userInfo: schemas.UserInfoResponse, users_info):
     # The list should be in the form of a PossibleMatches object
     pass
 
-def parse(pdfFile):
+async def parse(pdfFile):
     text=""
     reader=pdf.PdfReader(pdfFile)
     for page in range(len(reader.pages)):
