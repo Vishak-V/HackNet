@@ -41,7 +41,7 @@ class UserInfoAdd(BaseModel):
         orm_mode = True
 
 class UserInfoResponse(BaseModel):
-    id: UUID
+    id: Optional[UUID]
     userId: UUID
     name: str
     experienceLevel: Optional[str] = None

@@ -38,18 +38,19 @@ def get_possible_matches(db: Session=Depends(get_db),currentUser: schemas.UserRe
     existingMatches = db.query(models.Matches).filter(models.Matches.user1Id == currentUser.id).all()
     existingMatches = [match.user2Id for match in existingMatches]
 
+    print(q1,q2,q3,q4)
     # Filter out users who are already matched
-    dataScience = [userInfo for userInfo in q1 if userInfo.userId not in existingMatches]
-    backend = [userInfo for userInfo in q2 if userInfo.userId not in existingMatches]
-    frontend = [userInfo for userInfo in q3 if userInfo.userId not in existingMatches]
-    business = [userInfo for userInfo in q4 if userInfo.userId not in existingMatches]
+    dataScience = [userInfo for userInfo in q1 if userInfo['userId'] not in existingMatches]
+    backend = [userInfo for userInfo in q2 if userInfo['userId'] not in existingMatches]
+    frontend = [userInfo for userInfo in q3 if userInfo['userId'] not in existingMatches]
+    business = [userInfo for userInfo in q4 if userInfo['userId'] not in existingMatches]
 
     # Ensure the return type fits the schema
     return {
-        "dataScience": [schemas.UserInfoResponse.model_validate(vars(user)) for user in dataScience],
-        "backend": [schemas.UserInfoResponse.model_validate(vars(user)) for user in backend],
-        "frontend": [schemas.UserInfoResponse.model_validate(vars(user)) for user in frontend],
-        "business": [schemas.UserInfoResponse.model_validate(vars(user)) for user in business]
+        "dataScience": [schemas.UserInfoResponse.model_validate(user) for user in dataScience],
+        "backend": [schemas.UserInfoResponse.model_validate(user) for user in backend],
+        "frontend": [schemas.UserInfoResponse.model_validate(user) for user in frontend],
+        "business": [schemas.UserInfoResponse.model_validate(user) for user in business]
     }
 
 
