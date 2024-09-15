@@ -3,13 +3,11 @@ from passlib.context import CryptContext
 from app import schemas
 import typing_extensions as typing
 import google.generativeai as genai
-
 from .model import cos_sim
 from pydantic import BaseModel, Field, constr
-import pydantic
 import PyPDF2 as pdf
 from dotenv import load_dotenv
-import json
+
 from .config import settings
 
 load_dotenv() ## load all our environment variables
@@ -66,8 +64,6 @@ async def get_gemini_repsonse_roster(input):
         print(f"Error during Gemini request: {e}")
         return None
 
-
-#Prompt Template
 
 
 

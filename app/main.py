@@ -1,5 +1,4 @@
-import os
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from . import models
 from .database import engine
 from passlib.context import CryptContext
