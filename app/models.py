@@ -1,5 +1,5 @@
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Boolean, Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Boolean, Column, String, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from .database import Base
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -35,6 +35,7 @@ class UserInfo(Base):
     secondaryLanguages = Column(ARRAY(String))
     school = Column(String)
     goal = Column(String)
+    pronouns = Column(String)
     note = Column(String)
     trait = Column(String)
     discordLink = Column(String)

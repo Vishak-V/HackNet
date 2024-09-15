@@ -90,7 +90,7 @@ def update_user_goal(info: schemas.UpdateGoal, db: Session = Depends(get_db), cu
     return JSONResponse(content={"message":"Goal updated successfully"})
 
 @router.put("/imagelink",response_model=schemas.UserInfoResponse)
-def update_user_goal(info: schemas.UpdateImageLink, db: Session = Depends(get_db), currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
+def update_user_image(info: schemas.UpdateImageLink, db: Session = Depends(get_db), currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
     # Find the user record by ID
     updateQuery=db.query(models.UserInfo).filter(models.UserInfo.userId==currentUser.id)
     if not updateQuery.first():
@@ -101,3 +101,16 @@ def update_user_goal(info: schemas.UpdateImageLink, db: Session = Depends(get_db
     updateQuery.update(updatedData)
     db.commit()
     return JSONResponse(content={"message":"Image uploaded successfully"})
+
+@router.put("/pronouns",response_model=schemas.UserInfoResponse)
+def update_user_goal(info: schemas.UpdatePronouns, db: Session = Depends(get_db), currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
+    # Find the user record by ID
+    updateQuery=db.query(models.UserInfo).filter(models.UserInfo.userId==currentUser.id)
+    if not updateQuery.first():
+        raise HTTPException(status_code=404, detail="No info found for this user")
+    if updateQuery.first().userId!=currentUser.id:
+        raise HTTPException(status_code=403, detail="You are not authorized to update this user's info")
+    updatedData={"pronouns":info.pronouns}
+    updateQuery.update(updatedData)
+    db.commit()
+    return JSONResponse(content={"message":"Pronouns updated successfully"})

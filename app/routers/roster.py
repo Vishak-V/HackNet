@@ -8,6 +8,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi import UploadFile, File,APIRouter,Depends,status,HTTPException
 from typing import List
 from app import utils
+import json
 
 router=APIRouter(
     prefix="/roster",
@@ -33,16 +34,33 @@ def get_confirmed_matches(db: Session=Depends(get_db),currentUser: schemas.UserR
 
     return users_info_pydantic
 
-@router.post("/",response_model=schemas.UserInfoResponse)
-def get_team_score(roster=schemas.Roster,db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
+@router.post("/",response_model=schemas.TeamScore)
+async def get_team_score(roster:schemas.Roster,db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
 
-    currentUserInfo=db.query(models.UserInfo).filter(models.UserInfo==currentUser.id).first()
+    currentUserInfo = db.query(models.UserInfo).filter(models.UserInfo.userId == currentUser.id).first()
 
-    currentRoster=[currentUserInfo,roster.user1,roster.user2,roster.user3]
+    # Check if the user info was found
+    if not currentUserInfo:
+        raise HTTPException(status_code=404, detail="Current user info not found")
 
-    teamScore=utils.getScore(currentRoster)
+    # Convert current user info to Pydantic model
+    currentUserInfo = schemas.UserInfoResponse.model_validate(currentUserInfo.__dict__)
 
-    return teamScore
+    # Build current roster including the current user and roster users
+    currentRoster = [currentUserInfo, roster.user1, roster.user2, roster.user3]
+
+    # Calculate the team score using a utility function
+    score_data = await utils.getScore(currentRoster)
+    if isinstance(score_data, str):
+        
+        score_data = json.loads(score_data)
+
+    # Convert the result to a TeamScore instance
+    team_score = schemas.TeamScore(**score_data)
+
+    # Return the Pydantic model instance
+    return team_score
+
 
 
 
