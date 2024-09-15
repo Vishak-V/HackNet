@@ -108,6 +108,11 @@ class UpdateImageLink(BaseModel):
     class Config:
         orm_mode=True
 
+class UpdatePronouns(BaseModel):
+    pronouns: str
+    class Config:
+        orm_mode=True
+
 class ConfirmedMatchesInfo(BaseModel):
     confirmedMatchesInfo:List[UserInfoResponse]
 
