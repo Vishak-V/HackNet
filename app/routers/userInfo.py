@@ -84,7 +84,7 @@ def update_user_image(info: schemas.UpdateImageLink, db: Session = Depends(get_d
     db.commit()
     return JSONResponse(content={"message":"Image uploaded successfully"})
 
-@router.put("/goal",response_model=schemas.UserInfoResponse)
+@router.put("/pronouns",response_model=schemas.UserInfoResponse)
 def update_user_goal(info: schemas.UpdatePronouns, db: Session = Depends(get_db), currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
     # Find the user record by ID
     updateQuery=db.query(models.UserInfo).filter(models.UserInfo.userId==currentUser.id)
