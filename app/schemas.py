@@ -31,7 +31,7 @@ class UserInfoAdd(BaseModel):
     school: Optional[str]
     goal: Optional[str]
     note: Optional[str]
-    pronouns: Optional[str]=None
+    pronouns: Optional[str]
     trait: Optional[str] 
     primaryLanguages: Optional[List[str]]
     secondaryLanguages: Optional[List[str]]
