@@ -10,8 +10,11 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int = 60
     google_api_key: str
+    supabase_bucket_name: str
+    supabase_url: str
+    supabase_api_key: str
     # PROPELAUTH_AUTH_URL: str = "YOUR_URL_HERE"
-    # PROPELAUTH_API_KEY: str = "YOUR_KEY_HERE" 
+    # PROPELAUTH_API_KEY: str = "YOUR_KEY_HERE"
 
     class Config:
         env_file = ".env"
