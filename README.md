@@ -60,4 +60,3 @@ Hackathons are a great way for students to collaborate, learn new skills, and bu
     uvicorn app.main:app --reload
     ```
 
-### Frontend Setup
