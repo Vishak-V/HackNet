@@ -31,7 +31,8 @@ class UserInfoAdd(BaseModel):
     school: Optional[str]
     goal: Optional[str]
     note: Optional[str]
-    trait: Optional[str] # Assuming traits is a list of strings
+    pronouns: Optional[str]=None
+    trait: Optional[str] 
     primaryLanguages: Optional[List[str]]
     secondaryLanguages: Optional[List[str]]
     discordLink: Optional[str]
@@ -51,6 +52,7 @@ class UserInfoResponse(BaseModel):
     secondaryLanguages: Optional[List[str]] = None
     school: Optional[str] = None
     goal: Optional[str] = None
+    pronouns: Optional[str]=None
     note: Optional[str] = None
     trait: Optional[str] = None
     discordLink: Optional[str] = None

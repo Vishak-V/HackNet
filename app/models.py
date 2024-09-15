@@ -35,6 +35,7 @@ class UserInfo(Base):
     secondaryLanguages = Column(ARRAY(String))
     school = Column(String)
     goal = Column(String)
+    pronouns = Column(String)
     note = Column(String)
     trait = Column(String)
     discordLink = Column(String)
