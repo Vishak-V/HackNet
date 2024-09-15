@@ -161,13 +161,6 @@ def compare_cos_sim(
 
     role_similarity_results = {}
 
-    # Weighting matrix for experienceLevel based on goal
-    experience_weight = 1.0  # Default weight
-    if user_goal == 'win hackathon':
-        experience_weight = 2.0  # Prioritize experienceLevel for 'win hackathon'
-    elif user_goal == 'gain experience':
-        experience_weight = 1.5  # Moderate weight for experience matching
-
     # Identifier columns (you want to keep these but not use them in similarity computation)
     id_columns = ['id', 'userId', 'name', 'role1']  # Adjust based on your actual columns
 
@@ -179,10 +172,6 @@ def compare_cos_sim(
             # Separate feature columns from identifier columns
             vec_table_features = vec_table.drop(columns=id_columns, errors='ignore')  # Use only feature columns
             vec_table_identifiers = vec_table[id_columns]  # Keep the identifier columns
-
-            # Apply weight to experienceLevel column
-            vec_table_features['experienceLevel'] *= experience_weight
-            user_vector['experienceLevel'] *= experience_weight
 
             # Compute cosine similarity
             vec_table_vectors = vec_table_features.values
@@ -265,7 +254,7 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
 
     # Drop unnecessary columns
     for i, table in enumerate(role_tables):
-        vec_table = table.drop(columns=['school', 'note', 'discordLink', 'imageLink'], errors='ignore')
+        vec_table = table.drop(columns=['school', 'pronouns', 'note', 'discordLink', 'imageLink'], errors='ignore')
         if i == 0:
             vec_ds = vec_table
         elif i == 1:
@@ -343,6 +332,7 @@ def get_recommendations(info: Dict, allUsers: List[Dict]) -> Tuple[List[Dict]]:
                         "secondaryLanguages": matching_row['secondaryLanguages'].values[0],
                         "school": matching_row['school'].values[0],
                         "goal": matching_row['goal'].values[0],
+                        "pronouns": matching_row['pronouns'].values[0],
                         "note": matching_row['note'].values[0],
                         "trait": matching_row['trait'].values[0],
                         "discordLink": matching_row['discordLink'].values[0],
@@ -366,48 +356,16 @@ if __name__ == '__main__':
     USERDATA = pathlib.Path(os.path.join(project_dir, 'userInfo'))
     sys.path.append(USERDATA)
     
-    # Read in the input and an example
-    with open(os.path.join(USERDATA, 'rocco.json'), 'r') as file:
-        info = json.load(file)
+    # # Read in the input and an example
+    # with open(os.path.join(USERDATA, 'rocco.json'), 'r') as file:
+    #     info = json.load(file)
 
-    with open(os.path.join(USERDATA, 'input.json'), 'r') as inFile:
-        allUsers = json.load(inFile)
+    # with open(os.path.join(USERDATA, 'input.json'), 'r') as inFile:
+    #     allUsers = json.load(inFile)
 
     # Test case
-    info = {
-        'id': UUID('c01f12d9-5da3-478f-bd30-f6e6c8130975'),
-        'userId': UUID('0e70d649-c442-448d-b86f-e4dfbbcf8fbc'),
-        'name': 'Vishak Vikranth',
-        'experienceLevel': 'intermediate',
-        'role1': 'back-end',
-        'role2': 'data Science',
-        'primaryLanguages': ['Python', 'Java', 'Go'],
-        'secondaryLanguages': ['C/C++', 'SQL', 'R'],
-        'school': 'The University of Alabama',
-        'goal': None,
-        'note': None,
-        'trait': None,
-        'discordLink': None,
-        'imageLink': None
-    }
-    allUsers = [
-        {
-            'id': UUID('b14b2c7c-2a04-4f40-b79a-2a40e2b477ab'),
-            'userId': UUID('56f597ed-e433-4063-9712-29728ba1769e'),
-            'name': 'Vishak Vikranth',
-            'experienceLevel': 'expert',
-            'role1': 'back-end',
-            'role2': 'data science',
-            'primaryLanguages': ['C++', 'Python', 'Go'],
-            'secondaryLanguages': ['JavaScript', 'MATLAB', 'R'],
-            'school': 'THE UNIVERSITY OF ALABAMA',
-            'goal': None,
-            'note': None,
-            'trait': None,
-            'discordLink': None,
-            'imageLink': None
-        }
-    ]
+    info = {'id': UUID('45d450e5-1b42-418c-bac1-8f74064b09b7'), 'userId': UUID('65f10c5e-a74b-4e34-830b-953d1e289314'), 'name': 'Chanakya Thirumala Setty', 'experienceLevel': 'expert', 'role1': 'back-end', 'role2': 'data science', 'primaryLanguages': ['C++', 'Go', 'Python'], 'secondaryLanguages': ['JavaScript', 'SQL', 'MATLAB'], 'school': 'THE UNIVERSITY OF ALABAMA', 'goal': 'win hackathon', 'pronouns': 'He/Him', 'note': None, 'trait': None, 'discordLink': None, 'imageLink': '/photo1.png'}
+    allUsers = [{'id': UUID('ef3db3e3-eda5-4cd7-805a-dbab29a4312f'), 'userId': UUID('05db197b-7223-497d-8362-c7d8c4169abd'), 'name': 'Vishak Vikranth', 'experienceLevel': 'expert', 'role1': 'back-end', 'role2': 'data science', 'primaryLanguages': ['Python', 'Go', 'Java'], 'secondaryLanguages': ['SQL', 'R', 'C#'], 'school': 'The University of Alabama', 'goal': 'new goal', 'pronouns': 'She/Her', 'note': None, 'trait': None, 'discordLink': None, 'imageLink': None}]
 
     # Get recommendations
     data_science_list, backend_list, frontend_list, business_list = get_recommendations(
