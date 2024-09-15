@@ -11,6 +11,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi import UploadFile, File,APIRouter,Depends,status,HTTPException
 from typing import List
 from ..utils import parse
+from ..supabase import upload_file_to_supabase
 
 router=APIRouter(
     prefix="/userinfo",
@@ -29,7 +30,7 @@ def create_user_info(user: schemas.UserInfoAdd,db: Session=Depends(get_db),curre
 async def upload_file(file: UploadFile,db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
     if file.content_type != 'application/pdf':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file type")
-    
+
     #Optionally, save the file to a specific location
     # with open(f"/path/to/save/{file.filename}", "wb") as buffer:
     #     buffer.write(file.file.read())
@@ -37,7 +38,7 @@ async def upload_file(file: UploadFile,db: Session=Depends(get_db),currentUser: 
     # return parsed
     file_content = await file.read()
 
-    file_like_object = BytesIO(file_content) 
+    file_like_object = BytesIO(file_content)
     # Pass the file content to the async parse function
     parsed_data = await parse(file_like_object)
     #json_data = json.loads(parsed_data)
@@ -49,7 +50,24 @@ async def upload_file(file: UploadFile,db: Session=Depends(get_db),currentUser: 
     db.commit()
     db.refresh(newUserInfo)
     return newUserInfo
-    
+
+@router.post("/uploadphoto",status_code=status.HTTP_201_CREATED)
+async def upload_photo(file: UploadFile,db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
+    file_content = await file.read()
+    file_name = file.filename
+    file_url = upload_file_to_supabase(file_content, file_name)
+    if file_url is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error uploading file")
+
+    updateQuery=db.query(models.UserInfo).filter(models.UserInfo.userId==currentUser.id)
+    if not updateQuery.first():
+        raise HTTPException(status_code=404, detail="No info found for this user")
+    if updateQuery.first().userId!=currentUser.id:
+        raise HTTPException(status_code=403, detail="You are not authorized to update this user's info")
+    updatedData={"imageLink":file_url}
+    updateQuery.update(updatedData)
+    db.commit()
+    return JSONResponse(content={"message":"Uploaded photo successfully"})
 
 @router.get("/",response_model=schemas.UserInfoResponse)
 def get_user_info(db: Session=Depends(get_db),currentUser: schemas.UserResponse = Depends(oauth2.get_current_user)):
