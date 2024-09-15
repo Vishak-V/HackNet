@@ -10,4 +10,5 @@ def upload_file_to_supabase(file: bytes, file_name: str):
         file_url = supabase.storage.from_(settings.supabase_bucket_name).get_public_url(file_name)
         return file_url
     except Exception as e:
+        print(e)
         return None
